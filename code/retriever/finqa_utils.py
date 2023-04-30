@@ -249,7 +249,7 @@ def wrap_single_pair(tokenizer, question, context, label, max_seq_length,
     return this_input_feature
 
 def convert_single_mathqa_example(example, option, is_training, tokenizer, max_seq_length,
-                                  cls_token, sep_token):
+                                  cls_token, sep_token, terms):
     """Converts a single MathQAExample into Multiple Retriever Features."""
     """ option: tf idf or all"""
     """train: 1:3 pos neg. Test: all"""
@@ -267,7 +267,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
             this_gold_sent = example.all_positive[gold_ind]
             this_input_feature = wrap_single_pair(
                 tokenizer, question, this_gold_sent, 1, max_seq_length,
-                cls_token, sep_token)
+                cls_token, sep_token, terms)
 
             this_input_feature["filename_id"] = example.filename_id
             this_input_feature["ind"] = gold_ind
@@ -298,7 +298,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
                 this_text = all_text[i]
                 this_input_feature = wrap_single_pair(
                     tokenizer, example.question, this_text, 0, max_seq_length,
-                    cls_token, sep_token)
+                    cls_token, sep_token,terms)
                 this_input_feature["filename_id"] = example.filename_id
                 this_input_feature["ind"] = "text_" + str(i)
                 features_neg.append(this_input_feature)
@@ -309,7 +309,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
                 this_table_line = table_row_to_text(example.table[0], example.table[this_table_id])
                 this_input_feature = wrap_single_pair(
                     tokenizer, example.question, this_table_line, 0, max_seq_length,
-                    cls_token, sep_token)
+                    cls_token, sep_token, terms)
                 this_input_feature["filename_id"] = example.filename_id
                 this_input_feature["ind"] = "table_" + str(this_table_id)
                 features_neg.append(this_input_feature)
@@ -324,7 +324,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
             this_text = all_text[i]
             this_input_feature = wrap_single_pair(
                 tokenizer, example.question, this_text, -1, max_seq_length,
-                cls_token, sep_token)
+                cls_token, sep_token,terms)
             this_input_feature["filename_id"] = example.filename_id
             this_input_feature["ind"] = "text_" + str(i)
             features_neg.append(this_input_feature)
@@ -334,7 +334,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
             this_table_line = table_row_to_text(example.table[0], example.table[this_table_id])
             this_input_feature = wrap_single_pair(
                 tokenizer, example.question, this_table_line, -1, max_seq_length,
-                cls_token, sep_token)
+                cls_token, sep_token, terms)
             this_input_feature["filename_id"] = example.filename_id
             this_input_feature["ind"] = "table_" + str(this_table_id)
             features_neg.append(this_input_feature)
