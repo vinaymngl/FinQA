@@ -105,13 +105,13 @@ def train():
 
     train_iterator = DataLoader(
         is_training=True, data=train_features, batch_size=conf.batch_size, shuffle=True)
-
+    
     k = 0
     record_k = 0
     record_loss_k = 0
     loss, start_time = 0.0, time.time()
     record_loss = 0.0
-
+    print(train_iterator)
     for _ in range(conf.epoch):
         train_iterator.reset()
         for x in train_iterator:
