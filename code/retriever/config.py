@@ -3,9 +3,9 @@ class parameters():
     prog_name = "retriever"
 
     # set up your own path here
-    root_path = "your_project_path"
-    output_path = "path_to_store_outputs"
-    cache_dir = "path_for_other_cache"
+    root_path = "/content/NLP/"
+    output_path = "/content/NLP/output/"
+    cache_dir = "/content/NLP/cache/"
 
     # the name of your result folder.
     model_save_name = "retriever-bert-base-test"
