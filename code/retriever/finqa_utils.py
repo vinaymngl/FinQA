@@ -80,7 +80,7 @@ class MathQAExample(
         collections.namedtuple(
             "MathQAExample",
             "filename_id question all_positive \
-            pre_text post_text table"
+            pre_text post_text table terms"
         )):
 
     def convert_single_example(self, *args, **kwargs):
@@ -113,7 +113,7 @@ def tokenize(tokenizer, text, apply_basic_tokenization=False):
 
     Args:
       tokenizer: a tokenizer from bert.tokenization.FullTokenizer
-      text: text to tokenize
+      text: text to tokenizes
       apply_basic_tokenization: If True, apply the basic tokenization. If False,
         apply the full tokenization (basic + wordpiece).
 
@@ -201,19 +201,24 @@ def get_tf_idf_query_similarity(allDocs, query):
 
 
 def wrap_single_pair(tokenizer, question, context, label, max_seq_length,
-                    cls_token, sep_token):
+                    cls_token, sep_token, terms):
     '''
     single pair of question, context, label feature
     '''
     
     question_tokens = tokenize(tokenizer, question)
     this_gold_tokens = tokenize(tokenizer, context)
+    terms_tokens  = tokenize(tokenizer,terms)
 
     tokens = [cls_token] + question_tokens + [sep_token]
     segment_ids = [0] * len(tokens)
 
     tokens += this_gold_tokens
     segment_ids.extend([0] * len(this_gold_tokens))
+    tokens += [sep_token]
+    tokens += terms_tokens
+    segment_ids.extend([0] * (len(terms_tokens)+1))
+
 
     if len(tokens) > max_seq_length:
         tokens = tokens[:max_seq_length-1]
@@ -254,6 +259,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
     
     question = example.question
     all_text = example.pre_text + example.post_text
+    desc = example 
 
     if is_training:
         for gold_ind in example.all_positive:
@@ -348,6 +354,7 @@ def read_mathqa_entry(entry, tokenizer):
     pre_text = entry["pre_text"]
     post_text = entry["post_text"]
     table = entry["table"]
+    terms = entry["qa"]["financial_terms"]
 
     return MathQAExample(
         filename_id=filename_id,
@@ -355,4 +362,5 @@ def read_mathqa_entry(entry, tokenizer):
         all_positive=all_positive,
         pre_text=pre_text,
         post_text=post_text,
-        table=table)
+        table=table,
+        terms=terms)
