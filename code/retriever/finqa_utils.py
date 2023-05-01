@@ -354,7 +354,7 @@ def read_mathqa_entry(entry, tokenizer):
     pre_text = entry["pre_text"]
     post_text = entry["post_text"]
     table = entry["table"]
-    terms = entry["qa"]["financial_terms"]
+#     terms = entry["qa"]["financial_terms"]
 
     return MathQAExample(
         filename_id=filename_id,
