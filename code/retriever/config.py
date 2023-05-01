@@ -54,5 +54,5 @@ class parameters():
     epoch = 1
     learning_rate = 2e-5
 
-    report = 300
-    report_loss = 100
+    report = 50
+    report_loss = 20
