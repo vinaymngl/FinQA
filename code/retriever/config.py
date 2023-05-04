@@ -10,10 +10,10 @@ class parameters():
     # the name of your result folder.
     model_save_name = "retriever-bert-base-test"
 
-    train_file = root_path + "dataset/train25_percent.json"
-    valid_file = root_path + "dataset/dev25_percent.json"
+    train_file = root_path + "dataset/train.json"
+    valid_file = root_path + "dataset/dev.json"
 
-    test_file = root_path + "dataset/test25_percent.json"
+    test_file = root_path + "dataset/test.json"
 
     op_list_file = "operation_list.txt"
     const_list_file = "constant_list.txt"
