@@ -80,7 +80,7 @@ class MathQAExample(
         collections.namedtuple(
             "MathQAExample",
             "filename_id question all_positive \
-            pre_text post_text table"
+            pre_text post_text table financial_terms"
         )):
 
     def convert_single_example(self, *args, **kwargs):
@@ -200,7 +200,7 @@ def get_tf_idf_query_similarity(allDocs, query):
     return cosineSimilarities
 
 
-def wrap_single_pair(tokenizer, question, context, label, max_seq_length,
+def wrap_single_pair(tokenizer, question, context,terms, label, max_seq_length,
                     cls_token, sep_token):
     '''
     single pair of question, context, label feature
@@ -208,16 +208,16 @@ def wrap_single_pair(tokenizer, question, context, label, max_seq_length,
     
     question_tokens = tokenize(tokenizer, question)
     this_gold_tokens = tokenize(tokenizer, context)
-#     terms_tokens  = tokenize(tokenizer,terms)
+    terms_tokens  = tokenize(tokenizer,terms)
 
     tokens = [cls_token] + question_tokens + [sep_token]
     segment_ids = [0] * len(tokens)
 
     tokens += this_gold_tokens
     segment_ids.extend([0] * len(this_gold_tokens))
-#     tokens += [sep_token]
-#     tokens += terms_tokens
-#     segment_ids.extend([0] * (len(terms_tokens)+1))
+    tokens += [sep_token]
+    tokens += terms_tokens
+    segment_ids.extend([0] * (len(terms_tokens)+1))
 
 
     if len(tokens) > max_seq_length:
@@ -266,7 +266,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
 
             this_gold_sent = example.all_positive[gold_ind]
             this_input_feature = wrap_single_pair(
-                tokenizer, question, this_gold_sent, 1, max_seq_length,
+                tokenizer, question, this_gold_sent,example.financial_terms, 1, max_seq_length,
                 cls_token, sep_token)
 
             this_input_feature["filename_id"] = example.filename_id
@@ -297,7 +297,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
             if i not in pos_text_ids:
                 this_text = all_text[i]
                 this_input_feature = wrap_single_pair(
-                    tokenizer, example.question, this_text, 0, max_seq_length,
+                    tokenizer, example.question, this_text,example.financial_terms, 0, max_seq_length,
                     cls_token, sep_token)
                 this_input_feature["filename_id"] = example.filename_id
                 this_input_feature["ind"] = "text_" + str(i)
@@ -308,7 +308,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
                 this_table_row = example.table[this_table_id]
                 this_table_line = table_row_to_text(example.table[0], example.table[this_table_id])
                 this_input_feature = wrap_single_pair(
-                    tokenizer, example.question, this_table_line, 0, max_seq_length,
+                    tokenizer, example.question, this_table_line,example.financial_terms, 0, max_seq_length,
                     cls_token, sep_token)
                 this_input_feature["filename_id"] = example.filename_id
                 this_input_feature["ind"] = "table_" + str(this_table_id)
@@ -323,7 +323,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
         for i in range(len(all_text)):
             this_text = all_text[i]
             this_input_feature = wrap_single_pair(
-                tokenizer, example.question, this_text, -1, max_seq_length,
+                tokenizer, example.question, this_text,example.financial_terms, -1, max_seq_length,
                 cls_token, sep_token)
             this_input_feature["filename_id"] = example.filename_id
             this_input_feature["ind"] = "text_" + str(i)
@@ -333,7 +333,7 @@ def convert_single_mathqa_example(example, option, is_training, tokenizer, max_s
             this_table_row = example.table[this_table_id]
             this_table_line = table_row_to_text(example.table[0], example.table[this_table_id])
             this_input_feature = wrap_single_pair(
-                tokenizer, example.question, this_table_line, -1, max_seq_length,
+                tokenizer, example.question, this_table_line,example.financial_terms, -1, max_seq_length,
                 cls_token, sep_token)
             this_input_feature["filename_id"] = example.filename_id
             this_input_feature["ind"] = "table_" + str(this_table_id)
@@ -346,6 +346,7 @@ def read_mathqa_entry(entry, tokenizer):
 
     filename_id = entry["id"]
     question = entry["qa"]["question"]
+    # financial_terms= entry["financial_terms"]
     if "gold_inds" in entry["qa"]:
         all_positive = entry["qa"]["gold_inds"]
     else:
@@ -354,7 +355,7 @@ def read_mathqa_entry(entry, tokenizer):
     pre_text = entry["pre_text"]
     post_text = entry["post_text"]
     table = entry["table"]
-#     terms = entry["qa"]["financial_terms"]
+    financial_terms = entry["financial_terms"]
 
     return MathQAExample(
         filename_id=filename_id,
@@ -362,4 +363,5 @@ def read_mathqa_entry(entry, tokenizer):
         all_positive=all_positive,
         pre_text=pre_text,
         post_text=post_text,
-        table=table)
+        table=table,
+        financial_terms= financial_terms)
