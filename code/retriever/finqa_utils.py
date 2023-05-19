@@ -12,6 +12,8 @@ import random
 import enum
 import six
 import copy
+from transformers import AutoTokenizer
+
 from six.moves import map
 from six.moves import range
 from six.moves import zip
@@ -156,7 +158,17 @@ def _detokenize(tokens):
     text = text.strip()
     text = " ".join(text.split())
     return text
+def tokenize_entity(text):
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    tokens = tokenizer.tokenize(text)
+    return tokens
 
+def tokenize2(terms):
+  tokenized_items = []
+  for term in terms:
+    tokenized_term = tokenize_entity(term[1])
+    tokenized_items.extend(tokenized_term)
+  return tokenized_items
 
 def program_tokenization(original_program):
     original_program = original_program.split(', ')
@@ -205,10 +217,10 @@ def wrap_single_pair(tokenizer, question, context,terms, label, max_seq_length,
     '''
     single pair of question, context, label feature
     '''
-    
+    print(terms)
     question_tokens = tokenize(tokenizer, question)
     this_gold_tokens = tokenize(tokenizer, context)
-    terms_tokens  = tokenize(tokenizer,terms)
+    terms_tokens  = tokenize2(terms)
 
     tokens = [cls_token] + question_tokens + [sep_token]
     segment_ids = [0] * len(tokens)
